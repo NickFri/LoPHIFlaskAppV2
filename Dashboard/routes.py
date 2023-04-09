@@ -452,8 +452,7 @@ def index():
 
 @app.route('/load_index', methods=['GET'])
 def load_index():
-    global SCREEN_HEIGHT
-    return render_template('Dashboard.html', screen_height=SCREEN_HEIGHT)
+    return render_template('Dashboard.html')
 
 
 @app.route('/not_authenticated', methods=['GET'])
