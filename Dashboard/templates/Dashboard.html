@@ -9,8 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main_button_style.css') }}">
     <script>
         var r = document.querySelector(':root');
-        var w = window.innerWidth;
-        var h = {{ screen_height }};
+        var h = window.innerHeight;
         var he = (h-72)/2;
         console.log(he + 'px');
         r.style.setProperty('--base', he + 'px');
