@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Alarm settings</title>
+    <style>
+    .who {
+    padding-bottom: 20px;
+    }
+        .buttonbk {
+          background-color: #4d4dff;
+          color: white;
+          text-align: center;
+          display: inline-block;
+          border: none;
+          cursor: grab;
+          width: 20%;
+          height:50px
+}
+
+        cursor: pointer;
+        width:922px;  /* Screen resolution: 1024px */
+        height:80px; /* Screen resolution: 600px */
+    }
+    .button1 {background-color: #008CBA;} /* Blue */
+
+    </style>
+    <link rel="stylesheet" href="/static/css/alarm_clock.css">
+</head>
+<body>
+<input type="submit" class="buttonbk" onclick="location.href='{{ url_for('index') }}';" value="Go back"><br><br>
+<div class="whole">
+   <div class="wrapper">
+       <h2 class="who" id="displayDateTime"></h2>
+       <script type="text/javascript">
+          var date = new Date();
+          var hours = date.getHours();
+          var minutes = date.getMinutes();
+          var ampm = hours >= 12 ? 'pm' : 'am';
+          hours = hours % 12;
+          hours = hours ? hours : 12; // the hour '0' should be '12'
+          minutes = minutes < 10 ? '0'+minutes : minutes;
+          var strTime = hours + ':' + minutes + ' ' + ampm;
+
+          document.getElementById("displayDateTime").innerHTML = 'Current Time: ' + strTime;
+       </script>
+      <div class="content">
+        <div class="column">
+          <select style="font-size: 2rem;";>
+            <option name="Hour" value="Hour" selected disabled hidden>Hour</option>
+          </select>
+        </div>
+        <div class="column">
+          <select style="font-size: 2rem;";>
+            <option name="Minute" value="Minute" selected disabled hidden>Minute</option>
+          </select>
+        </div>
+        <div class="column">
+          <select style="font-size: 2rem;";>
+            <option name="AMPM" value="AM/PM" selected disabled hidden>AM/PM</option>
+          </select>
+        </div>
+      </div>
+       <button>Set Alarm</button>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/alarm_clock.js') }}"></script>
+
+
+</body>
+</html>

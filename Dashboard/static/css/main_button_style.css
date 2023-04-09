@@ -1,0 +1,43 @@
+:root {
+  --base: 268px;
+  --white: #ffffff;
+}
+
+.button {
+    border: none;
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+    width:100%;  /* Screen resolution: 1024px new: 1366 768 */
+    height:var(--base) /* Screen resolution: 600px */
+    }
+
+    .button1 {background-color: #4CAF50;} /* Green */
+    .button2 {background-color: #008CBA;} /* Blue */
+    .button3 {background-color: #4CAF50;} /* Green */
+    .button4 {background-color: #008CBA;} /* Blue */
+    .button5 {background-color: #4CAF50;} /* Green */
+    .button6 {background-color: #008CBA;} /* Blue */
+    .button7 {background-color: #008CBA;height:40px;width:100%;font-size: 21px;} /* Blue */
+    .button8 {background-color: #4CAF50;height:40px;width:100%;font-size: 21px;} /* Green */
+    .button9 {background-color: #008CBA;height:40px;width:100%;font-size: 21px;} /* Blue */
+
+.container {
+    display: grid;
+    grid-template-columns: 33% 33% 33%;
+    row-gap: 4px;
+    column-gap: 4px;
+}
+
+.home-message {
+    border: none;
+    display: inline-block;
+    width:100%;
+    height:var(--base);
+}

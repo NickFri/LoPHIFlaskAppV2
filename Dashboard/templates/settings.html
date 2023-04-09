@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Troubleshooting Page</title>
+    <script src="{{ url_for('static', filename='js/2.1.3_jquery.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}">
+    <link rel="stylesheet" href="/static/css/keyboard.css">
+    <script src="{{ url_for('static', filename='js/jquery.keyboard.js') }}"></script>
+    <style>
+        .container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            row-gap: 16px;
+            column-gap: 16px;
+            justify-content: center;
+            align-items: center;
+            margin: 32px 0;
+        }
+           .button {
+        background-color: #4286f4;
+        color: white;
+        padding: 14px 0;
+        text-align: center;
+        border: none;
+        cursor: pointer;
+        height: 100px;
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .button:hover {
+        background-color: #316ec5;
+    }
+
+    .buttonbk {
+        background-color: #4286f4;
+        color: white;
+        text-align: center;
+        border: none;
+        cursor: pointer;
+        height: 50px;
+        width: 10%;
+    }
+
+    input[type=text], input[type=password] {
+        width: 100%;
+        padding: 16px 8px;
+        margin: 8px 0;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+
+    form {
+        margin-bottom: 32px;
+    }
+
+    h3 {
+        margin-top: 32px;
+    }
+</style>
+</head>
+<body>
+    <button class="buttonbk" onclick="location.href='{{ url_for('index') }}';"><strong>Go Back</strong></button>
+    <br>
+    <div class="container">
+        <button class="button" onclick="location.href='{{ url_for('siglent_IP_settings') }}';"><strong>Additional Add-On</strong></button>
+    </div>
+    <h3>Send Message to Me</h3>
+    <form action="{{ url_for('settings') }}" method="post">
+        <div class="container">
+            <input type="text" id="text" placeholder="Enter text" name="email">
+            <button class="button" type="submit"><strong>Send</strong></button>
+        </div>
+    </form>
+    <script>
+        $(function(){
+            $('#text').keyboard();
+        });
+        console.log(localStorage.getItem("name"));
+    </script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/2.1.3_jquery.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main_button_style.css') }}">
+    <script>
+        var r = document.querySelector(':root');
+        var w = window.innerWidth;
+        var h = {{ screen_height }};
+        var he = (h-72)/2;
+        console.log(he + 'px');
+        r.style.setProperty('--base', he + 'px');
+    </script>
+    <script>
+    var a = {{ local_storage_clear }} ;
+    if(a==1){localStorage.clear();}
+
+    if(localStorage.getItem('state_timer')){}else{localStorage.setItem("state_timer", "Timer Disabled");}
+    if(localStorage.getItem('state_alarm')){}else{localStorage.setItem("state_alarm", "Alarm Disabled");}
+    </script>
+</head>
+<body>
+<div class="container">
+    <button class="button button1" id="onbutton" onclick="timer_onPopup()"><div class="popup1">
+    <span class="popuptext1" id="Button_Popup_ON">Turned ON</span>
+    </div><div style="font-size: 40px;">Turn on hello</div></button>
+
+    <script type="text/javascript">
+    function onPopup() {
+        var popup1 = document.getElementById("Button_Popup_ON");
+        popup1.classList.toggle("show1");
+    }
+    function timer_onPopup() {
+        onPopup();
+        setTimeout(function(){ onPopup(); }, 2000);
+    }
+    $(function() { $("#onbutton").click(function (event) { $.getJSON('/turnon', { },
+        function(data) { }); return false; }); });
+    </script>
+
+    <iframe id="webframe" class="home-message" src="http://www.metacafebliss.com/" title="Iframe Example"></iframe>
+    <script>
+            window.setInterval(function() {
+                reloadIFrame()
+            }, 20000);
+
+            function reloadIFrame() {
+                console.log('reloading..');
+                document.getElementById('webframe').src += '';
+            }
+    </script>
+
+    <button class="button button2" id="offbutton" onclick="timer_offPopup()"><div class="popup2">
+    <span class="popuptext2" id="Button_Popup_OFF">Turned OFF</span>
+    </div><div style="font-size: 40px;">Turn off</div></button>
+
+    <script type="text/javascript">
+    function offPopup() {
+        var popup2 = document.getElementById("Button_Popup_OFF");
+        popup2.classList.toggle("show2");
+    }
+    function timer_offPopup() {
+        offPopup();
+        setTimeout(function(){ offPopup(); }, 2000);
+    }
+    $(function() { $("#offbutton").click(function (event) {$.getJSON('/turnoff', { },
+        function(data) { }); return false; }); });
+    </script>
+
+
+    <button class="button button4" id="timerButton"><div class="popup4">
+    <span class="popuptext4" id="Button_Popup_Timer">Timer Enabled</span>
+    </div><div style="font-size: 40px;">Timer ON/OFF</div></button>
+
+    <script type=text/javascript>
+    function timerPopup() {
+    var popup4 = document.getElementById("Button_Popup_Timer");
+    popup4.classList.toggle("show4");}
+
+    $(function() { $("#timerButton").click(function (event) {
+    $.ajax({
+      type: "POST",
+      url: "/",
+      data: JSON.stringify({"timerButton":"yes"}),
+      contentType: "application/json",
+      dataType: 'json',
+      success: function(result) {
+            console.log(result);
+            $("#timerButton").attr("disabled", false);
+            var x = document.getElementById("Button_Popup_Timer");
+            if(localStorage.getItem("state_timer") == "Timer Disabled"){
+            x.innerHTML = "Timer Enabled";
+            localStorage.setItem("state_timer", "Timer Enabled");
+            }else{
+            localStorage.setItem("state_timer", "Timer Disabled");
+            x.innerHTML = "Timer Disabled";
+            }
+            console.log(localStorage.getItem("state_timer"));
+
+            timerPopup();
+            setTimeout(function(){ timerPopup(); }, 2000);
+    }}); return false; }); });
+    </script>
+
+
+    <button class="button button5" id="alarmButton"><div class="popup5">
+    <span class="popuptext5" id="Button_Popup_Alarm">Alarm Enabled</span>
+    </div><div style="font-size: 40px;">Alarm <br>ON/OFF</div></button>
+
+    <script type=text/javascript>
+    function alarmPopup() {
+    var popup5 = document.getElementById("Button_Popup_Alarm");
+    popup5.classList.toggle("show5");}
+
+    $(function() { $("#alarmButton").click(function (event) {
+    $.ajax({
+      type: "POST",
+      url: "/",
+      data: JSON.stringify({"alarmButton":"yes"}),
+      contentType: "application/json",
+      dataType: 'json',
+      success: function(result) {
+            console.log(result);
+            $("#alarmButton").attr("disabled", false);
+            var x = document.getElementById("Button_Popup_Alarm");
+            if(localStorage.getItem("state_alarm") == "Alarm Disabled"){
+            x.innerHTML = "Alarm Enabled";
+            localStorage.setItem("state_alarm", "Alarm Enabled");
+            }else{
+            localStorage.setItem("state_alarm", "Alarm Disabled");
+            x.innerHTML = "Alarm Disabled";
+            }
+            console.log(localStorage.getItem("state_alarm"));
+
+            alarmPopup();
+            setTimeout(function(){ alarmPopup(); }, 2000);
+    }}); return false; }); });
+    </script>
+
+
+    <button class="button button6" onclick="location.href='{{ url_for('settings') }}';"><div style="font-size: 40px;">Extra<br>Settings</div></button>
+    <button class="button button7" onclick="location.href='{{ url_for('timer_settings') }}';">Timer Settings</button>
+    <button class="button button8" onclick="location.href='{{ url_for('alarm_settings') }}';">Alarm Settings</button>
+    <button class="button button9" onclick="location.href='{{ url_for('no_wifi') }}';">Wifi</button>
+</div>
+</body>
+</html>

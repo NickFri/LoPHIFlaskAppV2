@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<title>WiFi Connection</title>
+<head>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/2.1.3_jquery.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}">
+    <link rel="stylesheet" href="/static/css/keyboard.css">
+    <script src="{{ url_for('static', filename='js/jquery.keyboard.js') }}"></script>
+
+    <style>
+      html, body {
+      display: flex;
+      justify-content: center;
+      font-family: Roboto, Arial, sans-serif;
+      font-size: 15px;
+      }
+      form {
+      border: 5px solid #f1f1f1;
+      }
+      input[type=text], input[type=password] {
+      width: 100%;
+      padding: 16px 8px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      }
+      .icon {
+      font-size: 110px;
+      display: flex;
+      justify-content: center;
+      color: #4286f4;
+      }
+      .buttonf {
+      background-color: #4286f4;
+      color: white;
+      padding: 14px 0;
+      margin: 10px;
+      border: none;
+      cursor: grab;
+      width: 60%;
+      }
+      .buttong {
+      background-color: #4286f4;
+      color: white;
+      padding: 14px 0;
+      margin: 10px;
+      border: none;
+      cursor: grab;
+      width: 20%;
+      }
+      h1 {
+      text-align:center;
+      fone-size:18;
+      }
+      button:hover {
+      opacity: 0.8;
+      }
+      .formcontainer {
+      text-align: center;
+      margin: 24px 50px 12px;
+      }
+      .container {
+      padding: 16px 0;
+      text-align:left;
+      }
+      span.psw {
+      float: right;
+      padding-top: 0;
+      padding-right: 15px;
+      }
+      /* Change styles for span on extra small screens */
+      @media screen and (max-width: 300px) {
+      span.psw {
+      display: block;
+      float: none;
+      }
+
+
+    </style>
+
+    <script>
+		$(function(){
+			$('#ssid').keyboard();
+			$('#pass').keyboard();
+		});
+
+
+    </script>
+</head>
+<body>
+<div>
+    <form action="{{ url_for('no_wifi') }}" method="post">
+        <h1>WiFi Connection</h1>
+        <div class="icon">
+            <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="formcontainer">
+            <div class="container">
+                <label for="uname"><strong>WIFI Name</strong></label>
+                <input type="text" id="ssid" placeholder="Enter wifi name and then click accept" name="wifi_ssid"
+                       required>
+                <label for="psw"><strong>WIFI Password</strong></label>
+                <input type="text" id="pass" placeholder="Enter Password and then click accept" name="wifi_pass"
+                       required>
+            </div>
+            <button class="buttonf" type="submit"><strong>Save & Continue</strong></button>
+            <br>
+            <div>Note: After connecting system will reboot</div>
+        </div>
+    </form>
+</div>
+
+
+</body>
+</html>
