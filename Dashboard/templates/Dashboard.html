@@ -3,30 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-
+<!-- timer to on - turns off timer then not on. and timer to alarm - turns on tube connection all lights briefly -->
     <script type="text/javascript" src="{{ url_for('static', filename='js/2.1.3_jquery.min.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main_button_style.css') }}">
     <script>
-        var r = document.querySelector(':root');
-        var h = window.innerHeight;
-        var he = (h-72)/2;
-        console.log(he + 'px');
-        r.style.setProperty('--base', he + 'px');
+        document.addEventListener('DOMContentLoaded', function() {
+            var r = document.querySelector(':root');
+            var h = window.innerHeight;
+            var he = (h-72)/2;
+            console.log(he + 'px');
+            r.style.setProperty('--base', he + 'px');
+        });
     </script>
-    <script>
-    var a = {{ local_storage_clear }} ;
-    if(a==1){localStorage.clear();}
+     <script type=text/javascript>
+      function alarmDisabledPopup(count) {
+          var popup = document.getElementById("alarmDisabledPopup");
+          popup.innerHTML = "<h1>Please Wait..</h1><h2>Countdown: <span id='countdown'>" + count + "</span></h2>";
+          popup.style.display = "block";
+          var countdownInterval = setInterval(function() {
+            count--;
+            document.getElementById("countdown").innerText = count;
+            if (count == 0) {
+              clearInterval(countdownInterval);
+              popup.style.display = "none";
+            }
+          }, 1000);
+          setTimeout(function() {
+            clearInterval(countdownInterval);
+            popup.style.display = "none";
+          }, count * 1000);
+        }
 
-    if(localStorage.getItem('state_timer')){}else{localStorage.setItem("state_timer", "Timer Disabled");}
-    if(localStorage.getItem('state_alarm')){}else{localStorage.setItem("state_alarm", "Alarm Disabled");}
-    </script>
+      function disableAlarm() {
+        //localStorage.setItem("state_alarm", "Alarm Disabled");
+        var x = document.getElementById("Button_Popup_Alarm");
+        x.innerHTML = "Alarm Disabled";
+        alarmDisabledPopup(5);
+      }
+
+      $(function() {
+            $.getJSON('/get_state', function(data) {
+              //  localStorage.setItem('state_timer', data.state_timer);
+              //  localStorage.setItem('state_alarm', data.state_alarm);
+            });
+        });
+
+      // get_state returns: jsonify({'state_timer': state_timer, 'state_alarm': state_alarm})
+
+      function sendJSONData(url, data) {
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          })
+          .then(response => response.json())
+          .then(data => console.log(data))
+          .catch(error => console.error(error));
+       }
+      </script>
 </head>
 <body>
 <div class="container">
     <button class="button button1" id="onbutton" onclick="timer_onPopup()"><div class="popup1">
     <span class="popuptext1" id="Button_Popup_ON">Turned ON</span>
-    </div><div style="font-size: 40px;">Turn on hello</div></button>
+    </div><div style="font-size: 40px;">Turn on</div></button>
 
     <script type="text/javascript">
     function onPopup() {
@@ -37,21 +80,64 @@
         onPopup();
         setTimeout(function(){ onPopup(); }, 2000);
     }
-    $(function() { $("#onbutton").click(function (event) { $.getJSON('/turnon', { },
-        function(data) { }); return false; }); });
+    $(function() {
+  $.ajaxSetup({
+    contentType: 'application/json'
+  });
+
+  $("#onbutton").click(function(event) {
+    $.getJSON('/get_state', function(data) {
+      console.log(data); // Print the response to the console for debugging purposes
+
+      if (data.state_timer == 'Disabled' && data.state_alarm == 'Disabled') {
+          $.getJSON('/turnon', function(data) {
+          // code to handle the response from the '/turnon' endpoint
+        });
+      }
+
+      if (data.state_alarm == 'Enabled') {
+        console.log("Alarm Enabled; Disabling alarm.");
+        alarmDisabledPopup(5);
+        $.post('/set_state', JSON.stringify({ Alarm: 'Alarm_off' }), function(result) {
+          if (result.state == 'ok') {
+              $.getJSON('/turnon', function(data) {
+                // code to handle the response from the '/turnon' endpoint
+              });
+          } else {
+            console.log("Failed to set alarm state to Alarm_off");
+          }
+        }, 'json').fail(function(jqXHR, textStatus, errorThrown) {
+          console.log(errorThrown);
+        }).always(function() {
+          // code to run after the request completes, regardless of success or failure
+        });
+      }
+      if (data.state_timer == 'Enabled') {
+        console.log("Timer Enabled; Disabling timer.");
+        $.post('/set_state', JSON.stringify({ Timer: 'Timer_off' }), function(result) {
+          if (result.state == 'ok') {
+            $.getJSON('/turnon', function(data) {
+                // code to handle the response from the '/turnon' endpoint
+              });
+          } else {
+            console.log("Failed to set timer state to Timer_off");
+          }
+        }, 'json').fail(function(jqXHR, textStatus, errorThrown) {
+          console.log(errorThrown);
+        }).always(function() {
+          // code to run after the request completes, regardless of success or failure
+        });
+      }
+    });
+    return false;
+  });
+});
     </script>
 
-    <iframe id="webframe" class="home-message" src="http://www.metacafebliss.com/" title="Iframe Example"></iframe>
-    <script>
-            window.setInterval(function() {
-                reloadIFrame()
-            }, 20000);
+    <div class="home-message">
+        {{ message_of_the_day }}
+    </div>
 
-            function reloadIFrame() {
-                console.log('reloading..');
-                document.getElementById('webframe').src += '';
-            }
-    </script>
 
     <button class="button button2" id="offbutton" onclick="timer_offPopup()"><div class="popup2">
     <span class="popuptext2" id="Button_Popup_OFF">Turned OFF</span>
@@ -66,8 +152,59 @@
         offPopup();
         setTimeout(function(){ offPopup(); }, 2000);
     }
-    $(function() { $("#offbutton").click(function (event) {$.getJSON('/turnoff', { },
-        function(data) { }); return false; }); });
+
+        $(function() {
+  $.ajaxSetup({
+    contentType: 'application/json'
+  });
+
+  $("#offbutton").click(function(event) {
+    $.getJSON('/get_state', function(data) {
+      console.log(data); // Print the response to the console for debugging purposes
+
+      if (data.state_timer == 'Disabled' && data.state_alarm == 'Disabled') {
+          $.getJSON('/turnoff', function(data) {
+          // code to handle the response from the '/turnon' endpoint
+        });
+      }
+
+      if (data.state_alarm == 'Enabled') {
+        console.log("Alarm Enabled; Disabling alarm.");
+        alarmDisabledPopup(5);
+        $.post('/set_state', JSON.stringify({ Alarm: 'Alarm_off' }), function(result) {
+          if (result.state == 'ok') {
+              $.getJSON('/turnoff', function(data) {
+                // code to handle the response from the '/turnon' endpoint
+              });
+          } else {
+            console.log("Failed to set alarm state to Alarm_off");
+          }
+        }, 'json').fail(function(jqXHR, textStatus, errorThrown) {
+          console.log(errorThrown);
+        }).always(function() {
+          // code to run after the request completes, regardless of success or failure
+        });
+      }
+      if (data.state_timer == 'Enabled') {
+        console.log("Timer Enabled; Disabling timer.");
+        $.post('/set_state', JSON.stringify({ Timer: 'Timer_off' }), function(result) {
+          if (result.state == 'ok') {
+            $.getJSON('/turnoff', function(data) {
+                // code to handle the response from the '/turnon' endpoint
+              });
+          } else {
+            console.log("Failed to set timer state to Timer_off");
+          }
+        }, 'json').fail(function(jqXHR, textStatus, errorThrown) {
+          console.log(errorThrown);
+        }).always(function() {
+          // code to run after the request completes, regardless of success or failure
+        });
+      }
+    });
+    return false;
+  });
+});
     </script>
 
 
@@ -76,75 +213,184 @@
     </div><div style="font-size: 40px;">Timer ON/OFF</div></button>
 
     <script type=text/javascript>
-    function timerPopup() {
-    var popup4 = document.getElementById("Button_Popup_Timer");
-    popup4.classList.toggle("show4");}
+        function timerPopup() {
+            var popup4 = document.getElementById("Button_Popup_Timer");
+            popup4.classList.toggle("show4");
+        }
+        $(document).ready(function() {
+  function timerPopup() {
+    const popup4 = document.getElementById("Button_Popup_Timer");
+    popup4.classList.toggle("show4");
+  }
 
-    $(function() { $("#timerButton").click(function (event) {
-    $.ajax({
-      type: "POST",
-      url: "/",
-      data: JSON.stringify({"timerButton":"yes"}),
-      contentType: "application/json",
-      dataType: 'json',
-      success: function(result) {
-            console.log(result);
-            $("#timerButton").attr("disabled", false);
-            var x = document.getElementById("Button_Popup_Timer");
-            if(localStorage.getItem("state_timer") == "Timer Disabled"){
-            x.innerHTML = "Timer Enabled";
-            localStorage.setItem("state_timer", "Timer Enabled");
-            }else{
-            localStorage.setItem("state_timer", "Timer Disabled");
-            x.innerHTML = "Timer Disabled";
+  $("#timerButton").click(function(event) {
+    $.getJSON('/get_state', function(data) {
+      const x = document.getElementById("Button_Popup_Timer");
+      console.log(data);
+
+      if (data.state_alarm === 'Enabled') {
+        console.log("Alarm Enabled; Disabling alarm.");
+        alarmDisabledPopup(5);
+
+        new Promise(function(resolve, reject) {
+          $.post('/set_state', JSON.stringify({ Alarm: 'Alarm_off' }), function(result) {
+            if (result.state === 'ok') {
+                $.post('/set_state', JSON.stringify({ Timer: 'Timer_on' }), function(result) {});
+                console.log("Timer state set to Timer_on successfully");
+                console.log("Alarm state set to Alarm_off successfully");
+                resolve();
+            } else {
+              reject("Failed to set alarm state to Alarm_off");
             }
-            console.log(localStorage.getItem("state_timer"));
+          }, 'json').fail(function(jqXHR, textStatus, errorThrown) {
+            reject(errorThrown);
+          });
+        }).then(function() {
+          // console.log("Alarm state set to Alarm_off successfully");
+        }).catch(function(error) {
+          console.log(error);
+        });
+      } else if (data.state_timer === 'Enabled') {
+        console.log("Timer Enabled; Disabling timer.");
+        new Promise(function(resolve, reject) {
+          $.post('/set_state', JSON.stringify({ Timer: 'Timer_off' }), function(result) {
+            if (result.state === 'ok') {
+              resolve();
+            } else {
+              reject("Failed to set Timer state to Timer_off");
+            }
+          }, 'json').fail(function(jqXHR, textStatus, errorThrown) {
+            reject(errorThrown);
+          });
+        }).then(function() {
+          console.log("Timer state set to Timer_off successfully");
+        }).catch(function(error) {
+          console.log(error);
+        });
+      } else {
+        $.post('/set_state', JSON.stringify({ Timer: 'Timer_on' }), function(result) {});
+        console.log("Timer state set to Timer_on successfully");
+      }
 
-            timerPopup();
-            setTimeout(function(){ timerPopup(); }, 2000);
-    }}); return false; }); });
-    </script>
+      return false;
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      console.log(errorThrown);
+    });
+  });
+});
+</script>
 
 
     <button class="button button5" id="alarmButton"><div class="popup5">
     <span class="popuptext5" id="Button_Popup_Alarm">Alarm Enabled</span>
     </div><div style="font-size: 40px;">Alarm <br>ON/OFF</div></button>
+    <script type="text/javascript">
+        function alarmPopup() {
+            var popup5 = document.getElementById("Button_Popup_Alarm");
+            popup5.classList.toggle("show5");
+        }
+        $(function() {
+          $("#alarmButton").click(function(event) {
+            $.getJSON('/get_state', function(data) {
+              var x = document.getElementById("Button_Popup_Timer");
+              console.log(data);
 
-    <script type=text/javascript>
-    function alarmPopup() {
-    var popup5 = document.getElementById("Button_Popup_Alarm");
-    popup5.classList.toggle("show5");}
+              if (data.state_timer === 'Enabled') {
+                console.log("Timer Enabled; Disabling timer.");
+                new Promise(function(resolve, reject) {
+                  $.post('/set_state', JSON.stringify({ Timer: 'Timer_off' }), function(result) {
+                    if (result.state === 'ok') {
+                        $.post('/set_state', JSON.stringify({ Alarm: 'Alarm_on' }), function(result) {});
+                        console.log("Timer state set to Timer_off successfully");
+                        console.log("Alarm state set to Alarm_on successfully");
+                        resolve();
+                    } else {
+                      reject("Failed to set Timer state to Timer_off");
+                    }
+                  }, 'json').fail(function(jqXHR, textStatus, errorThrown) {
+                    reject(errorThrown);
+                  });
+                }).then(function() {
+                  // console.log("Timer state set to Timer_off successfully");
+                }).catch(function(error) {
+                  console.log(error);
+                });
+              } else if (data.state_alarm === 'Enabled') {
+                console.log("Alarm Enabled; Disabling alarm.");
+                alarmDisabledPopup(5);
 
-    $(function() { $("#alarmButton").click(function (event) {
-    $.ajax({
-      type: "POST",
-      url: "/",
-      data: JSON.stringify({"alarmButton":"yes"}),
-      contentType: "application/json",
-      dataType: 'json',
-      success: function(result) {
-            console.log(result);
-            $("#alarmButton").attr("disabled", false);
-            var x = document.getElementById("Button_Popup_Alarm");
-            if(localStorage.getItem("state_alarm") == "Alarm Disabled"){
-            x.innerHTML = "Alarm Enabled";
-            localStorage.setItem("state_alarm", "Alarm Enabled");
-            }else{
-            localStorage.setItem("state_alarm", "Alarm Disabled");
-            x.innerHTML = "Alarm Disabled";
-            }
-            console.log(localStorage.getItem("state_alarm"));
+                new Promise(function(resolve, reject) {
+                  $.post('/set_state', JSON.stringify({ Alarm: 'Alarm_off' }), function(result) {
+                    if (result.state === 'ok') {
+                      resolve();
+                    } else {
+                      reject("Failed to set alarm state to Alarm_off");
+                    }
+                  }, 'json').fail(function(jqXHR, textStatus, errorThrown) {
+                    reject(errorThrown);
+                  });
+                }).then(function() {
+                  console.log("Alarm state set to Alarm_off successfully");
+                }).catch(function(error) {
+                  console.log(error);
+                });
+              } else {
+                $.post('/set_state', JSON.stringify({ Alarm: 'Alarm_on' }), function(result) {});
+                console.log("Alarm state set to Alarm_on successfully");
+              }
 
-            alarmPopup();
-            setTimeout(function(){ alarmPopup(); }, 2000);
-    }}); return false; }); });
+                return false;
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                  console.log(errorThrown);
+                });
+              });
+            });
     </script>
 
 
+    <div id="alarmDisabledPopup" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; text-align: center; padding-top: 20%;"></div>
+
     <button class="button button6" onclick="location.href='{{ url_for('settings') }}';"><div style="font-size: 40px;">Extra<br>Settings</div></button>
-    <button class="button button7" onclick="location.href='{{ url_for('timer_settings') }}';">Timer Settings</button>
-    <button class="button button8" onclick="location.href='{{ url_for('alarm_settings') }}';">Alarm Settings</button>
-    <button class="button button9" onclick="location.href='{{ url_for('no_wifi') }}';">Wifi</button>
+<script type="text/javascript">
+     function settings_state_change(url) {
+        $.getJSON('/get_state', function(data) {
+            console.log(data); // Print the response to the console for debugging purposes
+            if (data.state_timer == 'Enabled') {
+                console.log("Timer Enabled; Disabling timer.");
+                alarmDisabledPopup(1);
+                sendJSONData('/set_state', { Timer: 'Timer_off' });
+                setTimeout(function() {
+                    window.location.href = url;
+                }, 1000); // 30 seconds in milliseconds
+            } else if (data.state_alarm == 'Enabled') {
+                console.log("Alarm Enabled; Disabling alarm.");
+                alarmDisabledPopup(5);
+                sendJSONData('/set_state', { Alarm: 'Alarm_off' });
+                setTimeout(function() {
+                    window.location.href = url;
+                }, 5000); // 30 seconds in milliseconds
+            } else {
+                window.location.href = url;
+            }
+        });
+    }
+</script>
+
+<button class="button button7" id="timer-settings">Timer Settings</button>
+<button class="button button8" id="alarm-settings">Alarm Settings</button>
+
+<script type="text/javascript">
+    document.getElementById("timer-settings").addEventListener("click", function() {
+        settings_state_change("{{ url_for('timer_settings') }}");
+    });
+
+    document.getElementById("alarm-settings").addEventListener("click", function() {
+        settings_state_change("{{ url_for('alarm_settings') }}");
+    });
+</script>
+
+
+ <button class="button button9" onclick="location.href='{{ url_for('no_wifi') }}';">Wifi</button>
 </div>
 </body>
 </html>

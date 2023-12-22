@@ -36,8 +36,9 @@
 }
 
 .home-message {
-    border: none;
-    display: inline-block;
-    width:100%;
-    height:var(--base);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5%;
+  font-family: Brush Script MT, cursive;
 }
