@@ -298,10 +298,10 @@ def amplifier_power(mode):
             # Reversed at relay level
             # Default on at startup
             # GPIO 76 1 AMP ON
-            os.system('sudo gpioset 1 85=0')
+            os.system('sudo gpioset 1 84=1')
         elif mode == "OFF":
             # GPIO 76 0 AMP OFF
-            os.system('sudo gpioset 1 85=1')
+            os.system('sudo gpioset 1 84=0')
     except Exception as error:
         send_statistic('ACTIVE_UPDATE', 'power_supply_amp_ Error ' + str(error))
 
@@ -320,10 +320,10 @@ def extension_power_controller(mode):
             # Reversed at relay level
             # Default on at startup
             # GPIO 80 1 extension_power ON
-            os.system('sudo gpioset 1 96=1')
+            os.system('sudo gpioset 1 81=1')
         elif mode == "OFF":
             # GPIO 80 0 extension_power OFF
-            os.system('sudo gpioset 1 96=0')
+            os.system('sudo gpioset 1 81=0')
     except Exception as error:
         send_statistic('ACTIVE_UPDATE', 'power_supply_amp_ Error ' + str(error))
 
