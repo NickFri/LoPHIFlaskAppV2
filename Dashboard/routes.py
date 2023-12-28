@@ -295,7 +295,7 @@ def signal_gen_controller(mode):
 def amplifier_power(mode):
     try:
         if mode == "ON":
-            # Reversed at relay level
+            # Reversed at relay level terminals
             # Default on at startup
             # GPIO 76 1 AMP ON
             os.system('sudo gpioset 1 84=1')
@@ -317,7 +317,7 @@ def extension_power_controller(mode):
     # Used for siglent
     try:
         if mode == "ON":
-            # Reversed at relay level
+            # Reversed at relay level terminals
             # Default on at startup
             # GPIO 80 1 extension_power ON
             os.system('sudo gpioset 1 81=1')
@@ -334,10 +334,10 @@ def tube1tube2_controller(mode):
         if mode == "ON":
             # GPIO 79+89 0 TUBE ON
             os.system('sudo gpioset 1 82=0')
-            os.system('sudo gpioset 1 82=0')
+            os.system('sudo gpioset 1 83=0')
         elif mode == "OFF":
             # GPIO 79+89 1 TUBE OFF
-            os.system('sudo gpioset 1 83=1')
+            os.system('sudo gpioset 1 82=1')
             os.system('sudo gpioset 1 83=1')
     except Exception as error:
         send_statistic('ACTIVE_UPDATE', 'tube Error ' + str(error))
