@@ -298,10 +298,10 @@ def amplifier_power(mode):
             # Reversed at relay level
             # Default on at startup
             # GPIO 76 1 AMP ON
-            os.system('sudo gpioset 1 37=1')
+            os.system('sudo gpioset 1 84=1')
         elif mode == "OFF":
             # GPIO 76 0 AMP OFF
-            os.system('sudo gpioset 1 37=0')
+            os.system('sudo gpioset 1 84=0')
     except Exception as error:
         send_statistic('ACTIVE_UPDATE', 'power_supply_amp_ Error ' + str(error))
 
@@ -309,8 +309,8 @@ def amplifier_power(mode):
 def press_screen_power_button():
     # relay clicked twice to signal
     # power button being pressed
-    os.system('sudo gpioset 1 31=0')
-    os.system('sudo gpioset 1 31=1')
+    os.system('sudo gpioset 1 97=0')
+    os.system('sudo gpioset 1 97=1')
 
 
 def extension_power_controller(mode):
@@ -320,10 +320,10 @@ def extension_power_controller(mode):
             # Reversed at relay level
             # Default on at startup
             # GPIO 80 1 extension_power ON
-            os.system('sudo gpioset 1 36=1')
+            os.system('sudo gpioset 1 81=1')
         elif mode == "OFF":
             # GPIO 80 0 extension_power OFF
-            os.system('sudo gpioset 1 36=0')
+            os.system('sudo gpioset 1 81=0')
     except Exception as error:
         send_statistic('ACTIVE_UPDATE', 'power_supply_amp_ Error ' + str(error))
 
@@ -333,12 +333,12 @@ def tube1tube2_controller(mode):
     try:
         if mode == "ON":
             # GPIO 79+89 0 TUBE ON
-            os.system('sudo gpioset 1 38=0')
-            os.system('sudo gpioset 1 38=0')
+            os.system('sudo gpioset 1 82=0')
+            os.system('sudo gpioset 1 82=0')
         elif mode == "OFF":
             # GPIO 79+89 1 TUBE OFF
-            os.system('sudo gpioset 1 40=1')
-            os.system('sudo gpioset 1 40=1')
+            os.system('sudo gpioset 1 83=1')
+            os.system('sudo gpioset 1 83=1')
     except Exception as error:
         send_statistic('ACTIVE_UPDATE', 'tube Error ' + str(error))
     pass
