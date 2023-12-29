@@ -248,7 +248,7 @@ def signal_gen_controller(mode):
                     processing = True
                     print("OFF")
                     tube1tube2_controller("OFF")
-                    time.sleep(.4)
+                   # time.sleep(.4)
                     #  MHS5200 SIGNAL
                     os.system(
                         'sudo ' + HOME_PATH +
