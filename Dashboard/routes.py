@@ -247,12 +247,12 @@ def signal_gen_controller(mode):
                 if is_running:
                     processing = True
                     print("OFF")
+                    tube1tube2_controller("OFF")
+                    time.sleep(.4)
                     #  MHS5200 SIGNAL
                     os.system(
                         'sudo ' + HOME_PATH +
                         'MHS-5200-Driver/mhs5200 /dev/ttyUSB0 channel 1 arb 0 amplitude 4 freq 364 off')
-                    time.sleep(.4)
-                    tube1tube2_controller("OFF")
                     stop_run_time = time.time()
                     run_time = float((stop_run_time - start_run_time) / 60)
                     send_statistic('MINUTES', run_time)
@@ -279,15 +279,17 @@ def signal_gen_controller(mode):
             if is_running:
                 processing = True
                 print("OFF")
+                tube1tube2_controller("OFF")
+                time.sleep(.4)
                 result = OFF()
                 if result == 'Query complete.':
                     print('Signal generator turned off successfully.')
-                    tube1tube2_controller("OFF")
                     stop_run_time = time.time()
                     run_time = float((stop_run_time - start_run_time) / 60)
                     send_statistic('MINUTES', run_time)
                     is_running = False
                 else:
+                    tube1tube2_controller("ON")
                     send_statistic('ACTIVE_UPDATE', 'Signal generator failed to turn off:' + result)
                 processing = False
 
@@ -528,7 +530,7 @@ schedulerThread = None
 authenticationThread = None
 temperatureThread = None
 state_timer_disabled_alarm = "False"
-alarmModeSleep = 5
+alarmModeSleep = 5  # seconds
 
 
 def run_pending_jobs():
