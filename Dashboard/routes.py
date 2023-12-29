@@ -185,14 +185,14 @@ def ON():
         s = Siglent_SocketConnect()
         if isinstance(s, str):
             # Socket connection failed
-            return s
+            return 'failed'
         # Socket connection succeeded
         Siglent_SocketSend(s, b'C2:OUTP ON')  # Set CH1 ON
         Siglent_SocketSend(s, b'C1:OUTP ON')  # test
         Siglent_SocketClose(s)  # Close socket
         return 'Query complete.'
     except Exception as error:
-        return error.__str__()
+        return 'failed'
 
 
 def OFF():
@@ -200,14 +200,14 @@ def OFF():
         s = Siglent_SocketConnect()
         if isinstance(s, str):
             # Socket connection failed
-            return s
+            return 'failed'
         # Socket connection succeeded
         Siglent_SocketSend(s, b'C2:OUTP OFF')
         Siglent_SocketSend(s, b'C1:OUTP OFF')
         Siglent_SocketClose(s)  # Close socket
         return 'Query complete.'
     except Exception as error:
-        return error.__str__()
+        return 'failed'
 
 
 def lockTheONOFFButton(ans):
