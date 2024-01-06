@@ -17,7 +17,7 @@ MESSAGE_OF_THE_DAY = AUTHENTICATION = SIGLENT = COMMAND = None
 
 # Define Local variables
 HOME_PATH = USER_TIMER = USER_ALARM = USER_NAME = WIFI_DRIVER_NAME = \
-    PATH_POST = AUTH_KEY = SIGLENT_CONNECTION = ""
+    PATH_POST = AUTH_KEY = SIGLENT_CONNECTION = "192.168.10.2"
 ONCE_INDEX = False
 Profile_filePath = os.path.dirname(os.path.abspath(__file__)) + "/Profile/profile_save.json"
 
