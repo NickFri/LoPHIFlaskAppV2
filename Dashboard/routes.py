@@ -311,9 +311,9 @@ def amplifier_power(mode):
 def press_screen_power_button():
     # relay clicked twice to signal
     # power button being pressed
-    os.system('sudo gpioset 1 85=0')
-    time.sleep(4)
     os.system('sudo gpioset 1 85=1')
+    time.sleep(4)
+    os.system('sudo gpioset 1 85=0')
 
 
 def extension_power_controller(mode):
@@ -531,7 +531,7 @@ schedulerThread = None
 authenticationThread = None
 temperatureThread = None
 state_timer_disabled_alarm = "False"
-alarmModeSleep = 5  # seconds
+alarmModeSleep = 30  # seconds
 
 
 def run_pending_jobs():
