@@ -96,7 +96,7 @@ input[type=number]::-webkit-outer-spin-button {
 <form action="{{ url_for('timer_settings') }}" method="post">
     <div class="number-input">
         <button type="button" onclick="this.parentNode.querySelector('input[type=number]').stepDown()"></button>
-        <input class="quantity" min="1" max="20" name="set-time" type="number" value="1">
+        <input class="quantity" min="1" max="120" name="set-time" type="number" value="1">
         <button type="button" class="plus"
                 onclick="this.parentNode.querySelector('input[type=number]').stepUp()"></button>
     </div>
