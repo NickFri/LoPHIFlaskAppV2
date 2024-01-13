@@ -102,6 +102,12 @@ def start_Temperature():
             else:
                 # Set high fan speed
                 set_pwm_frequency_duty_cycle(frequency_hz=1000, duty_cycle_percent=97)
+                # 60 c and the amp should turn off
+                signal_gen_controller("OFF")
+                lockTheONOFFButton(True)
+                amplifier_power("OFF")
+                extension_power_controller("OFF")
+
 
             # Enable the PWM
             write_value(ENABLE_PATH, "1")
