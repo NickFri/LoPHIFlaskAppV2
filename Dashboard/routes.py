@@ -24,13 +24,14 @@ Profile_filePath = os.path.dirname(os.path.abspath(__file__)) + "/Profile/profil
 
 def load__profile():  # only called once, afterwards authentication thread and dl + save settings takes
     global HOME_PATH, PATH_POST, USER_NAME, AUTH_KEY, WIFI_DRIVER_NAME, \
-        USER_TIMER, USER_ALARM
+        USER_TIMER, USER_ALARM, rollingAlarmTime
     #  Load Variables from Profile
     AUTH_KEY = readJsonValueFromKey("AUTH_KEY", Profile_filePath)
     PATH_POST = readJsonValueFromKey("PATH_POST", Profile_filePath)
     USER_TIMER = readJsonValueFromKey("USER_TIMER", Profile_filePath)
     USER_ALARM = readJsonValueFromKey("USER_ALARM", Profile_filePath)
     WIFI_DRIVER_NAME = readJsonValueFromKey("WIFI_DRIVER_NAME", Profile_filePath)
+    rollingAlarmTime = USER_ALARM
 
 
 temp = 2
@@ -538,6 +539,8 @@ authenticationThread = None
 temperatureThread = None
 state_timer_disabled_alarm = "False"
 alarmModeSleep = 30  # seconds
+rollingAlarm = False
+rollingAlarmTime = None
 
 
 def run_pending_jobs():
@@ -565,13 +568,35 @@ def clearAlarms():
 
 
 def timer_action():
-    global state_timer, timer_job
+    global state_timer, timer_job, alarm_job, state_alarm, rollingAlarm, rollingAlarmTime
     print("Timer : " + state_timer)
     schedule.cancel_job(timer_job)
     state_timer = "Disabled"
     time.sleep(0.5)
     signal_gen_controller("OFF")
     print("Timer Complete")
+    if rollingAlarm:
+        # Split the time into hours and minutes
+        hours, minutes = map(int, rollingAlarmTime.split(':'))
+        # Increment the time by 30 minutes
+        minutes += 30
+        # Handle overflow (if minutes exceed 59)
+        if minutes >= 60:
+            hours += 1
+            minutes -= 60
+        # Ensure hours are within the 0-23 range
+        hours %= 24
+        # Format the updated time back to "HH:MM"
+        rollingAlarmTime = f"{hours:02d}:{minutes:02d}"
+        signal_gen_controller("OFF")
+        lockTheONOFFButton(True)
+        amplifier_power("OFF")
+        extension_power_controller("OFF")
+        state_alarm = "Enabled"
+        print("Alarm : " + state_alarm)
+        alarm_job = schedule.every().day.at(rollingAlarmTime).do(alarm_action)
+        send_statistic('ALARMS_USED', '1')
+        press_screen_power_button()
 
 
 def alarm_action():
@@ -719,7 +744,7 @@ def timer_settings():
 
 @app.route('/alarm_settings', methods=['GET', 'POST'])
 def alarm_settings():
-    global ONCE_INDEX, USER_ALARM
+    global ONCE_INDEX, USER_ALARM, rollingAlarmTime, rollingAlarm
     if request.method == 'GET':
         if not ONCE_INDEX: return index()
         # Clear all Timers
@@ -733,6 +758,10 @@ def alarm_settings():
         USER_ALARM = datetime.strftime(in_time, "%H:%M")
         # update profile with new user time
         updateJsonFile('USER_ALARM', USER_ALARM, Profile_filePath)
+        if data.get('rollingAlarm'):
+            rollingAlarm = True
+
+        rollingAlarmTime = USER_ALARM
         return load_index()
 
 
